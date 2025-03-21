@@ -1,19 +1,43 @@
+import express from 'express';
 import jwt from 'jsonwebtoken';
+import db from '../config/db.js';
+import tokenVerification from '../middleware/auth.js';
 
-const tokenVerification = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+const router = express.Router();
 
-  if (!token) {
-    return res.status(401).json({ message: 'Access denied. No token provided.' });
-  }
+router.post('/login', (req, res) => {
+  const { first_name, password } = req.body;
 
-  try {
-    const decoded = jwt.verify(token, 'akshay123');
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(400).json({err });
-  }
-};
+  db.query(
+    'SELECT * FROM users WHERE first_name = ? AND password = ?',
+    [first_name, password],
+    (err, results) => {
+      if (err) {
+        return res.json({ message: 'Database error' });
+      }
+      const user = results[0];
 
-export default tokenVerification;
+      const token = jwt.sign(
+        { username: user.first_name, password: user.password },
+         'akshay123',
+        { expiresIn: '24h' }
+      );
+
+      res.json({ token });
+    }
+  );
+});
+
+router.post('/validate-token', tokenVerification, (req, res) => {
+  const user = req.user;
+
+  res.json({
+    message: 'Token is valid',
+    user: {
+      username: user.first_name,
+      password: user.password,
+    },
+  });
+});
+
+export default router;

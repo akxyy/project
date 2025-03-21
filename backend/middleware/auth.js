@@ -16,4 +16,4 @@ const tokenVerification = (req, res, next) => {
   }
 };
 
-export default tokenVerification; 
+export default tokenVerification;
