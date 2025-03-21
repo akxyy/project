@@ -27,11 +27,7 @@ app.get('/', (req, res) => {
   const fetchData = new Promise((resolve, reject) => {
     fetch('https://dummyjson.com/products').then(response => {
         if (!response.ok) {
-          fetch('https://dummyjson.com/products').then(response => {
-            if (!response.ok) {
               reject(new Error(`error`));
-            }
-          });
         } else {
           resolve(response.json());
         }
