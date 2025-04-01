@@ -6,10 +6,11 @@ import destinationsRoute from './routes/destinations.js';
 import flightsRoute from './routes/flights.js';
 import bookingRoute from './routes/booking.js';
 import paymentRoute from './routes/payments.js';
+import cors from 'cors';
 
 const app = express();
 const port = 3000;
-
+app.use(cors());
 app.use(express.json());
 app.use("/auth", authRoute);
 app.use("/booking", tokenVerification, bookingRoute);
@@ -18,26 +19,9 @@ app.use("/hotels", tokenVerification, hotelRoute);
 app.use("/destinations", tokenVerification, destinationsRoute);
 app.use("/flights", tokenVerification, flightsRoute);
 
-app.get('/', (req, res) => {
-  const fetchData = new Promise((resolve, reject) => {
-    fetch('https://dummyjson.com/products')
-      .then(response => {
-        if (!response.ok) {
-          reject(new Error('error'));
-        } else {
-          resolve(response.json());
-        }
-      })
-      .catch(err => reject(err));
-  });
-
-  fetchData
-    .then(data => res.send(data))
-    .catch(err => {
-      console.error(err);
-      res.send({ message: 'Error fetching data' });
-    });
-});
+app.get('/',(req,res)=>{
+  res.send("Welcome to Tourism home page")
+})
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

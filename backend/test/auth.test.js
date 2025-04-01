@@ -18,9 +18,9 @@ describe('Authentication Routes', () => {
   });
 
   describe('POST /login', () => {
-    it('should return a token when valid credentials are provided', async () => {
-      const mockUser = { first_name: 'akshay', password: 'password123' };
-      
+    it('should return a token when valid id and first_name are provided', async () => {
+      const mockUser = { id: 1, first_name: 'akshay' };
+
       db.query.mockImplementationOnce((query, params, callback) => {
         callback(null, [mockUser]);
       });
@@ -29,11 +29,22 @@ describe('Authentication Routes', () => {
         .post('/login')
         .send({
           first_name: 'akshay',
-          password: 'password123',
+          id: 1,
         });
 
       expect(response.status).toBe(200);
       expect(response.body.token).toBeDefined();
+    });
+
+    it('should return an error if id or first_name are missing', async () => {
+      const response = await request(app)
+        .post('/login')
+        .send({
+          first_name: 'akshay',
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe('first_name and id are required');
     });
 
     it('should return an error if db query fails', async () => {
@@ -45,18 +56,34 @@ describe('Authentication Routes', () => {
         .post('/login')
         .send({
           first_name: 'akshay',
-          password: 'wrongpassword',
+          id: 1,
         });
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(500);
       expect(response.body.message).toBe('Database error');
+    });
+
+    it('should return an error if id and first_name do not match in the database', async () => {
+      db.query.mockImplementationOnce((query, params, callback) => {
+        callback(null, []);
+      });
+
+      const response = await request(app)
+        .post('/login')
+        .send({
+          first_name: 'akshay',
+          id: 999,
+        });
+
+      expect(response.status).toBe(401);
+      expect(response.body.message).toBe('Invalid id or first_name');
     });
   });
 
   describe('POST /validate-token', () => {
     it('should return valid token info if token is valid', async () => {
       tokenVerification.mockImplementationOnce((req, res, next) => {
-        req.user = { first_name: 'John', password: 'password123' };
+        req.user = { id: 1, first_name: 'John' };
         next();
       });
 
@@ -66,8 +93,8 @@ describe('Authentication Routes', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe('Token is valid');
-      expect(response.body.user.username).toBe('John');
-      expect(response.body.user.password).toBe('password123');
+      expect(response.body.user.id).toBe(1);
+      expect(response.body.user.first_name).toBe('John');
     });
 
     it('should return 401 if token is invalid', async () => {
