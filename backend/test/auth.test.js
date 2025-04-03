@@ -18,8 +18,8 @@ describe('Authentication Routes', () => {
   });
 
   describe('POST /login', () => {
-    it('should return a token when valid id and first_name are provided', async () => {
-      const mockUser = { id: 1, first_name: 'akshay' };
+    it('should return a token when valid id, first_name, and password are provided', async () => {
+      const mockUser = { id: 1, first_name: 'akshay', password: 'password123' };
 
       db.query.mockImplementationOnce((query, params, callback) => {
         callback(null, [mockUser]);
@@ -30,21 +30,23 @@ describe('Authentication Routes', () => {
         .send({
           first_name: 'akshay',
           id: 1,
+          password: 'password123',
         });
 
       expect(response.status).toBe(200);
       expect(response.body.token).toBeDefined();
     });
 
-    it('should return an error if id or first_name are missing', async () => {
+    it('should return an error if first_name, id, or password are missing', async () => {
       const response = await request(app)
         .post('/login')
         .send({
           first_name: 'akshay',
+          id: 1,
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toBe('first_name and id are required');
+      expect(response.body.message).toBe('first_name, id, and password are required');
     });
 
     it('should return an error if db query fails', async () => {
@@ -57,6 +59,7 @@ describe('Authentication Routes', () => {
         .send({
           first_name: 'akshay',
           id: 1,
+          password: 'password123',
         });
 
       expect(response.status).toBe(500);
@@ -73,6 +76,7 @@ describe('Authentication Routes', () => {
         .send({
           first_name: 'akshay',
           id: 999,
+          password: 'password123',
         });
 
       expect(response.status).toBe(401);

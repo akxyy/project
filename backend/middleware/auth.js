@@ -6,12 +6,12 @@ const tokenVerification = (req, res, next) => {
     return res.status(401).json({ message: 'Token is missing' });
   }
 
-  jwt.verify(token, 'akshay123', (err, decoded) => {
+  jwt.verify(token,process.env.JWT_SECRET_KEY, (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: 'Token is invalid' });
     }
-    req.user = decoded; 
-    next(); 
+    req.user = decoded;
+    next();
   });
 };
 

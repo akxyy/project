@@ -7,9 +7,11 @@ import flightsRoute from './routes/flights.js';
 import bookingRoute from './routes/booking.js';
 import paymentRoute from './routes/payments.js';
 import cors from 'cors';
+import 'dotenv/config'
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 4000;
+
 app.use(cors());
 app.use(express.json());
 app.use("/auth", authRoute);
@@ -19,9 +21,9 @@ app.use("/hotels", tokenVerification, hotelRoute);
 app.use("/destinations", tokenVerification, destinationsRoute);
 app.use("/flights", tokenVerification, flightsRoute);
 
-app.get('/',(req,res)=>{
-  res.send("Welcome to Tourism home page")
-})
+app.get('/', (req, res) => {
+  res.send("Welcome to Tourism home page");
+});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
