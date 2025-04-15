@@ -9,12 +9,12 @@ export const getHotel = (req, res) => {
 };
 
 export const createHotel = (req, res) => {
-  const { id, name, price_per_night, destination_id, amenities } = req.body;
+  const { id, name, price_per_night, destination_id, amenities,image_url } = req.body;
   const query =
-    "INSERT INTO hotels (id, name, price_per_night, destination_id, amenities) VALUES (?, ?, ?, ?, ?)";
+    "INSERT INTO hotels (id, name, price_per_night, destination_id, amenities,image_url) VALUES (?, ?, ?, ?, ?, ?)";
   db.query(
     query,
-    [id, name, price_per_night, destination_id, amenities],
+    [id, name, price_per_night, destination_id, amenities,image_url],
     (err) => {
       if (err) return res.json({ message: "Error creating hotel" });
       res.json({ message: "Hotel created successfully" });
@@ -24,12 +24,12 @@ export const createHotel = (req, res) => {
 
 export const updateHotel = (req, res) => {
   const { id } = req.params;
-  const { name, price_per_night, destination_id, amenities } = req.body;
+  const { name, price_per_night, destination_id, amenities,image_url } = req.body;
   const query =
-    "UPDATE hotels SET name = ?, price_per_night = ?, destination_id = ?, amenities = ? WHERE id = ?";
+    "UPDATE hotels SET name = ?, price_per_night = ?, destination_id = ?, amenities = ? image_url=? WHERE id = ?";
   db.query(
     query,
-    [name, price_per_night, destination_id, amenities, id],
+    [name, price_per_night, destination_id, amenities, id,image_url],
     (err) => {
       if (err) return res.json({ message: "Error updating hotel" });
       res.json({ message: "Hotel updated successfully" });
@@ -43,5 +43,18 @@ export const deleteHotel = (req, res) => {
   db.query(query, [id], (err) => {
     if (err) return res.json({ message: "Error deleting hotel" });
     res.json({ message: "Hotel deleted successfully" });
+  });
+};
+
+export const filterHotels = (req, res) => {
+  const { destination_id } = req.query;
+  if (!destination_id) {
+    return res.status(400).json({ message: "Destination ID is required" });
+  }
+
+  const query = "SELECT * FROM hotels WHERE destination_id = ?";
+  db.query(query, [destination_id], (err, results) => {
+    if (err) return res.json({ message: "Error filtering hotels" });
+    res.json({ data: results });
   });
 };

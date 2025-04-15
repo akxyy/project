@@ -5,41 +5,20 @@ import tokenVerification from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post('/getUserId', (req, res) => {
-  const { first_name } = req.body;
-
-  if (!first_name) {
-    return res.status(400).json({ message: 'first_name is required' });
-  }
-
-  db.query('SELECT id FROM users WHERE first_name = ?', [first_name], (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: 'Database error' });
-    }
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const user = results[0];
-    res.json({ id: user.id });
-  });
-});
-
 router.post('/login', (req, res) => {
-  const { first_name, id, password } = req.body;
+  const { first_name, password } = req.body;
 
-  if (!first_name || !id || !password) {
-    return res.status(400).json({ message: 'first_name, id, and password are required' });
+  if (!first_name || !password) {
+    return res.status(400).json({ message: 'first_name and password are required' });
   }
 
-  db.query('SELECT id, first_name, password FROM users WHERE id = ? AND first_name = ?', [id, first_name], (err, results) => {
+  db.query('SELECT first_name, password FROM users WHERE first_name = ?', [first_name], (err, results) => {
     if (err) {
       return res.status(500).json({ message: 'Database error' });
     }
 
     if (results.length === 0) {
-      return res.status(401).json({ message: 'Invalid id or first_name' });
+      return res.status(401).json({ message: 'Invalid first_name' });
     }
 
     const user = results[0];
@@ -49,7 +28,7 @@ router.post('/login', (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, first_name: user.first_name },
+      { first_name: user.first_name },
       process.env.JWT_SECRET_KEY,
       { expiresIn: '24h' }
     );
@@ -64,7 +43,6 @@ router.post('/validate-token', tokenVerification, (req, res) => {
   res.json({
     message: 'Token is valid',
     user: {
-      id: user.id,
       first_name: user.first_name,
     },
   });

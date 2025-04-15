@@ -49,3 +49,24 @@ export const deleteDestination = (req, res) => {
     res.json({ message: "Destination deleted successfully" });
   });
 };
+
+export const getDestination = async (req, res) => {
+  const { id } = req.params;
+  const query = "SELECT * FROM destinations where id=?";
+  const promise = new Promise((resolve, reject) => {
+    db.query(query, [id], (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+
+  try {
+    const results = await promise;
+    res.json({ data: results });
+  } catch (err) {
+    res.json({ err });
+  }
+}; 
