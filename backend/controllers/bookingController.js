@@ -21,11 +21,10 @@ const submitBooking = (req, res) => {
   db.query(query, [name, phone, checkin, checkout, duration, Price, hotel_name], (err) => {
     if (err) {
       console.error("Booking insert error:", err);
-      return res.status(500).json({ message: "Error creating booking", error: err.sqlMessage });
+      return res.status(500).json({ message: "Error creating booking", error: err });
     }
     res.json({ message: "Booking submitted successfully" });
   });
 };
-
 
 export { getBooking,submitBooking };

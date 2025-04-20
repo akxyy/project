@@ -49,7 +49,7 @@ export const deleteHotel = (req, res) => {
 export const filterHotels = (req, res) => {
   const { destination_id } = req.query;
   if (!destination_id) {
-    return res.status(400).json({ message: "Destination ID is required" });
+    return res.json({ message: "Destination ID is required" });
   }
 
   const query = "SELECT * FROM hotels WHERE destination_id = ?";

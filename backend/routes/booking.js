@@ -6,5 +6,4 @@ const router = express.Router();
 router.get('/', getBooking);
 router.post("/",submitBooking)
 
-
 export default router;

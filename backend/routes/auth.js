@@ -9,22 +9,22 @@ router.post('/login', (req, res) => {
   const { first_name, password } = req.body;
 
   if (!first_name || !password) {
-    return res.status(400).json({ message: 'first_name and password are required' });
+    return res.json({ message: 'first_name and password are required' });
   }
 
   db.query('SELECT first_name, password FROM users WHERE first_name = ?', [first_name], (err, results) => {
     if (err) {
-      return res.status(500).json({ message: 'Database error' });
+      return res.json({ message: 'Database error' });
     }
 
     if (results.length === 0) {
-      return res.status(401).json({ message: 'Invalid first_name' });
+      return res.json({ message: 'Invalid first_name' });
     }
 
     const user = results[0];
 
     if (user.password !== password) {
-      return res.status(401).json({ message: 'Invalid password' });
+      return res.json({ message: 'Invalid password' });
     }
 
     const token = jwt.sign(
